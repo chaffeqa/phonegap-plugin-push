@@ -45,6 +45,8 @@
 
 - (void)init:(CDVInvokedUrlCommand*)command;
 {
+    [self.commandDelegate runInBackground:^ {
+        
     NSLog(@"Push Plugin register called");
     self.callbackId = command.callbackId;
     
@@ -110,9 +112,15 @@
     
     if (notificationMessage)			// if there is a pending startup notification
         [self notificationReceived];	// go ahead and process it
+
+    }];
 }
 
 - (void)didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    if (self.callbackId == nil) {
+        NSLog(@"Unexpected call to didRegisterForRemoteNotificationsWithDeviceToken, ignoring: %@", deviceToken);
+        return;
+    }
     NSLog(@"Push Plugin register success: %@", deviceToken);
     
     NSMutableDictionary *results = [NSMutableDictionary dictionary];
@@ -176,6 +184,10 @@
 
 - (void)didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
 {
+    if (self.callbackId == nil) {
+        NSLog(@"Unexpected call to didFailToRegisterForRemoteNotificationsWithError, ignoring: %@", error);
+        return;
+    }
     NSLog(@"Push Plugin register failed");
     [self failWithMessage:@"" withError:error];
 }
@@ -183,7 +195,7 @@
 - (void)notificationReceived {
     NSLog(@"Notification received");
     
-    if (notificationMessage)
+    if (notificationMessage && self.callbackId != nil)
     {
         NSMutableDictionary* message = [NSMutableDictionary dictionaryWithCapacity:4];
         NSMutableDictionary* additionalData = [NSMutableDictionary dictionaryWithCapacity:4];
