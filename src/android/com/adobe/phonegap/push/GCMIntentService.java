@@ -509,16 +509,17 @@ public class GCMIntentService extends GcmListenerService implements PushConstant
         String icon = extras.getString(ICON);
         if (icon != null) {
             iconId = resources.getIdentifier(icon, DRAWABLE, packageName);
-            Log.d(LOG_TAG, "using icon from plugin options");
+            Log.d(LOG_TAG, "using icon from gcm options");
         }
         else if (localIcon != null) {
             iconId = resources.getIdentifier(localIcon, DRAWABLE, packageName);
             Log.d(LOG_TAG, "using icon from plugin options");
         }
         if (iconId == 0) {
-            Log.d(LOG_TAG, "no icon resource found - using application icon");
-            iconId = context.getApplicationInfo().icon;
+            Log.d(LOG_TAG, "no icon resource found - using default icon");
+            iconId = resources.getIdentifier(DEFAULT_SMALL_ICON, DRAWABLE, packageName);
         }
+        // NOTE: this is required or else some devices will not display a notification in the tray
         mBuilder.setSmallIcon(iconId);
     }
 

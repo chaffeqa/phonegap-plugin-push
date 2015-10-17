@@ -26,9 +26,13 @@
 	<engines>
 		<engine name="cordova" version=">=3.0.0" />
 	</engines>
+  
+  
 
 	<!-- android -->
 	<platform name="android">
+    
+    <hook type="after_prepare" src="scripts/default_push_resources.js" />
 
 		<config-file target="res/xml/config.xml" parent="/*">
 			<feature name="PushNotification" >
