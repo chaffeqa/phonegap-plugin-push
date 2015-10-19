@@ -23,10 +23,10 @@ module.exports = function (context) {
       // console.log("copying "+srcfile+" to "+destfile);
       var destdir = path.dirname(destfile);
       if (fs.existsSync(srcfile) && fs.existsSync(destdir)) {
-          fs.createReadStream(srcfile).pipe(
-             fs.createWriteStream(destfile));
+          fs.createReadStream(srcfile).pipe(fs.createWriteStream(destfile));
       }
     })
+    deferral.resolve();
   } else {
     deferral.resolve();
   }
