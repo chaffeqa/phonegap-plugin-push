@@ -279,7 +279,7 @@ public class GCMIntentService extends GcmListenerService implements PushConstant
          * Notification Sound
          */
         if (soundOption) {
-            setNotificationSound(context, extras, mBuilder);
+            setNotificationSound(extras, packageName, resources, mBuilder);
         }
 
         /*
@@ -435,18 +435,25 @@ public class GCMIntentService extends GcmListenerService implements PushConstant
         }
     }
 
-    private void setNotificationSound(Context context, Bundle extras, NotificationCompat.Builder mBuilder) {
+    private void setNotificationSound(Bundle extras, String packageName, Resources resources, NotificationCompat.Builder mBuilder) {
         String soundname = extras.getString(SOUNDNAME);
+        int resourceId = 0;
         if (soundname == null) {
             soundname = extras.getString(SOUND);
         }
         if (soundname != null) {
-            Uri sound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE
-                    + "://" + context.getPackageName() + "/raw/" + soundname);
-            Log.d(LOG_TAG, sound.toString());
-            mBuilder.setSound(sound);
-        } else {
+            resourceId = resources.getIdentifier(parseFileName(soundname), "raw", packageName);
+        } 
+        if (resourceId == 0) {
+            if (soundname != null) {
+              Log.w(LOG_TAG, "unable to locate sound in res/raw/" + parseFileName(soundname) + "(input: " + soundname + ")");
+            } else {
+              Log.d(LOG_TAG, "No sound provided, using system default");
+            }
             mBuilder.setSound(android.provider.Settings.System.DEFAULT_NOTIFICATION_URI);
+        } else {
+            Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/" + Integer.toString(resourceId) );
+            mBuilder.setSound(soundUri);
         }
     }
 
@@ -571,6 +578,16 @@ public class GCMIntentService extends GcmListenerService implements PushConstant
     private static String getAppName(Context context) {
         CharSequence appName =  context.getPackageManager().getApplicationLabel(context.getApplicationInfo());
         return (String)appName;
+    }
+    
+    private String parseFileName(String pathOrFile){
+      String[] pathParts = pathOrFile.split("/");
+      int lastItem = pathParts.length - 1;
+      String fileName = pathParts[lastItem];
+      if (fileName.indexOf(".") > 0){
+        fileName = fileName.substring(0, fileName.indexOf(".") );
+      }
+      return fileName;
     }
 
     private int parseInt(String value, Bundle extras) {
