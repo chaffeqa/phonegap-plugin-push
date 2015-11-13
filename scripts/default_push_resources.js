@@ -19,7 +19,7 @@ module.exports = function (context) {
     ];
     androidFolders.forEach(function (folderName) {
       var srcfile = path.join(rootDir, 'res', 'ic_notifications_none_white_18dp', 'android', folderName, 'ic_notifications_none_white_18dp.png');
-      var destfile = path.join(context.opts.projectRoot, 'platform', 'android', 'res', folderName, 'ic_notifications_none_white_18dp.png');
+      var destfile = path.join(context.opts.projectRoot, 'platforms', 'android', 'res', folderName, 'ic_notifications_none_white_18dp.png');
       // console.log("copying "+srcfile+" to "+destfile);
       var destdir = path.dirname(destfile);
       if (fs.existsSync(srcfile) && fs.existsSync(destdir)) {
